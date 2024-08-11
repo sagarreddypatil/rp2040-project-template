@@ -1,0 +1,25 @@
+{
+    "cmake.configureOnOpen": false,
+    "cmake.statusbar.advanced": {
+        "debug": {
+            "visibility": "hidden"
+        },
+        "launch": {
+            "visibility": "hidden"
+        },
+        "build": {
+            "visibility": "hidden"
+        },
+        "buildTarget": {
+            "visibility": "hidden"
+        },
+    },
+    "editor.tabSize": 4,
+    "files.associations": {
+        "assert.h": "c"
+    },
+    "C_Cpp.autoAddFileAssociations": false,
+    "debug.internalConsoleOptions": "neverOpen",
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.intelliSenseEngineFallback": "enabled"
+}

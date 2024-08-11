@@ -1,0 +1,75 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # docs:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - name: Packages
+  #       uses: awalsh128/cache-apt-pkgs-action@latest
+  #       with:
+  #         packages: doxygen
+  #         version: 1.0
+
+  #     - name: Generate Docs
+  #       run: make docs
+
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          path: external
+          key: deps-${{ hashFiles('Makefile') }}
+
+      - name: Download dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: make deps
+
+      - name: APT Cache Hash File
+        run: sudo apt-get install -s gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build > apt-sim.txt
+
+      - name: APT Enable Cache
+        run: echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' | sudo tee /etc/apt/apt.conf.d/99-keep-downloads
+
+      - name: APT Cache Perms
+        run: sudo chmod -R 777 /var/cache/apt/archives
+
+      - name: Restore APT Cache
+        id: cache-apt-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            /var/cache/apt/archives/**.deb
+            !/var/cache/apt/archives/partial
+            !/var/cache/apt/archives/lock
+          key: apt-cache-${{ hashFiles('apt-sim.txt') }}
+
+      - name: APT Install
+        run: sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+
+      - name: Save APT Cache
+        id: cache-apt-save
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            /var/cache/apt/archives/**.deb
+            !/var/cache/apt/archives/partial
+            !/var/cache/apt/archives/lock
+          key: ${{ steps.cache-apt-restore.outputs.cache-primary-key }}
+
+      - name: Build
+        run: make release
