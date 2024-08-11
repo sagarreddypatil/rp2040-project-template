@@ -15,12 +15,16 @@
 
 ### Cloning this Repo
 
-Just clone it like you normally would
+Just clone it like you normally would. There are no submodules. Dependencies are cloned in the
+Makefile
 
 ## Building
 
 Run `make` or `make build` for a debug build, or `make release` for a release build.
 `make clean` will delete the build folder.
 
-Output binaries for each board will be present in `build/bin/`. ELF binaries can
-be found in `build/bin/elf/`
+If you changed a dependency version in the `Makefile`, run `make clean-deps` to force
+redownload on the next build
+
+Output binary will be `build/bin/program.uf2`, and the ELF file can be found in
+as `build/bin/elf/program.elf`
